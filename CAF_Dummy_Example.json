@@ -1,0 +1,539 @@
+[  
+   {  
+      "id":"c7bc4ae8.42c6d8",
+      "type":"subflow",
+      "name":"DITAS CAF",
+      "info":"",
+      "in":[  
+
+      ],
+      "out":[  
+         {  
+            "x":854.9999923706055,
+            "y":1064.9998779296875,
+            "wires":[  
+               {  
+                  "id":"d03eb2dd.eb07e",
+                  "port":0
+               }
+            ]
+         },
+         {  
+            "x":854.9999141693115,
+            "y":1159.9997673034668,
+            "wires":[  
+               {  
+                  "id":"d03eb2dd.eb07e",
+                  "port":1
+               }
+            ]
+         },
+         {  
+            "x":859.0000133514404,
+            "y":1241.999994277954,
+            "wires":[  
+               {  
+                  "id":"d03eb2dd.eb07e",
+                  "port":2
+               }
+            ]
+         },
+         {  
+            "x":854.9999694824219,
+            "y":1316.0000801086426,
+            "wires":[  
+               {  
+                  "id":"d03eb2dd.eb07e",
+                  "port":3
+               }
+            ]
+         }
+      ]
+   },
+   {  
+      "id":"c470a741.b643f8",
+      "type":"http in",
+      "z":"c7bc4ae8.42c6d8",
+      "name":"[web service in]   CAF",
+      "url":"/CAF/:exposed_method",
+      "method":"post",
+      "upload":false,
+      "swaggerDoc":"",
+      "x":124.78118896484375,
+      "y":46.164727210998535,
+      "wires":[  
+         [  
+            "63273f5.6302fc"
+         ]
+      ]
+   },
+   {  
+      "id":"d03eb2dd.eb07e",
+      "type":"switch",
+      "z":"c7bc4ae8.42c6d8",
+      "name":"[switch]   check that the exposed_method is included in the VDC BP",
+      "property":"req.params.exposed_method",
+      "propertyType":"msg",
+      "rules":[  
+         {  
+            "t":"eq",
+            "v":"patient-details",
+            "vt":"str"
+         },
+         {  
+            "t":"eq",
+            "v":"last-values",
+            "vt":"str"
+         },
+         {  
+            "t":"eq",
+            "v":"test-values",
+            "vt":"str"
+         },
+         {  
+            "t":"eq",
+            "v":"test-average",
+            "vt":"str"
+         },
+         {  
+            "t":"else"
+         }
+      ],
+      "checkall":"false",
+      "outputs":5,
+      "x":462.7897033691406,
+      "y":1258.6193180084229,
+      "wires":[  
+         [  
+
+         ],
+         [  
+
+         ],
+         [  
+
+         ],
+         [  
+
+         ],
+         [  
+            "2b8c0675.de899a"
+         ]
+      ]
+   },
+   {  
+      "id":"63273f5.6302fc",
+      "type":"switch",
+      "z":"c7bc4ae8.42c6d8",
+      "name":"[switch]   check that purpose exists",
+      "property":"$exists(payload.purpose)",
+      "propertyType":"jsonata",
+      "rules":[  
+         {  
+            "t":"false"
+         },
+         {  
+            "t":"else"
+         }
+      ],
+      "checkall":"false",
+      "outputs":2,
+      "x":292.01422119140625,
+      "y":208.0056915283203,
+      "wires":[  
+         [  
+            "6e1153e5.6e32ec"
+         ],
+         [  
+            "453f713f.cc45f"
+         ]
+      ]
+   },
+   {  
+      "id":"6e1153e5.6e32ec",
+      "type":"function",
+      "z":"c7bc4ae8.42c6d8",
+      "name":"[function]   error response",
+      "func":"msg.payload = \"the body of every HTTP request should contain the purpose of the request\";\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":672.2442855834961,
+      "y":281.9261236190796,
+      "wires":[  
+         [  
+            "12a8ad8c.1f4172"
+         ]
+      ]
+   },
+   {  
+      "id":"12a8ad8c.1f4172",
+      "type":"http response",
+      "z":"c7bc4ae8.42c6d8",
+      "name":"[web service out]   CAF",
+      "statusCode":"",
+      "headers":{  
+
+      },
+      "x":733.241569519043,
+      "y":169.75292491912842,
+      "wires":[  
+
+      ]
+   },
+   {  
+      "id":"453f713f.cc45f",
+      "type":"function",
+      "z":"c7bc4ae8.42c6d8",
+      "name":"[function]   strore purpose details to msg",
+      "func":"msg.purpose = {};\n\nmsg.purpose.value = msg.payload.purpose;\n\nmsg.purpose.type = typeof(msg.payload.purpose);\n\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":341.24436950683594,
+      "y":306.9262409210205,
+      "wires":[  
+         [  
+            "901ccead.c8225"
+         ]
+      ]
+   },
+   {  
+      "id":"901ccead.c8225",
+      "type":"switch",
+      "z":"c7bc4ae8.42c6d8",
+      "name":"[switch]   check that purpose is string",
+      "property":"purpose.type",
+      "propertyType":"msg",
+      "rules":[  
+         {  
+            "t":"neq",
+            "v":"string",
+            "vt":"str"
+         },
+         {  
+            "t":"else"
+         }
+      ],
+      "checkall":"false",
+      "outputs":2,
+      "x":330.24436950683594,
+      "y":429.65356159210205,
+      "wires":[  
+         [  
+            "688ef245.e8ba8c"
+         ],
+         [  
+            "61a6a91f.18db58"
+         ]
+      ]
+   },
+   {  
+      "id":"688ef245.e8ba8c",
+      "type":"function",
+      "z":"c7bc4ae8.42c6d8",
+      "name":"[function]   error response",
+      "func":"msg.payload = \"the purpose of the HTTP request should be a string\";\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":656.2443771362305,
+      "y":428.4716901779175,
+      "wires":[  
+         [  
+            "42c69a.fb9ae968"
+         ]
+      ]
+   },
+   {  
+      "id":"42c69a.fb9ae968",
+      "type":"http response",
+      "z":"c7bc4ae8.42c6d8",
+      "name":"[web service out]   CAF",
+      "statusCode":"",
+      "headers":{  
+
+      },
+      "x":765.2415542602539,
+      "y":335.2984094619751,
+      "wires":[  
+
+      ]
+   },
+   {  
+      "id":"1d769b00.f2ea45",
+      "type":"function",
+      "z":"c7bc4ae8.42c6d8",
+      "name":"[function]   error response",
+      "func":"msg.payload = \"the body of every HTTP request should contain the requester_id of the requester\";\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":677.2443695068359,
+      "y":647.4715633392334,
+      "wires":[  
+         [  
+            "aa021ed7.955ed"
+         ]
+      ]
+   },
+   {  
+      "id":"aa021ed7.955ed",
+      "type":"http response",
+      "z":"c7bc4ae8.42c6d8",
+      "name":"[web service out]   CAF",
+      "statusCode":"",
+      "headers":{  
+
+      },
+      "x":890.2415313720703,
+      "y":704.298433303833,
+      "wires":[  
+
+      ]
+   },
+   {  
+      "id":"7f27b3d3.bb410c",
+      "type":"function",
+      "z":"c7bc4ae8.42c6d8",
+      "name":"[function]   strore requester_id details to msg",
+      "func":"msg.requester_id = {};\n\nmsg.requester_id.value = msg.payload.requester_id;\n\nmsg.requester_id.type = typeof(msg.payload.requester_id);\n\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":259.24436950683594,
+      "y":898.471718788147,
+      "wires":[  
+         [  
+            "aca5fe43.c45e2"
+         ]
+      ]
+   },
+   {  
+      "id":"aca5fe43.c45e2",
+      "type":"switch",
+      "z":"c7bc4ae8.42c6d8",
+      "name":"[switch]   check that requester_id is string",
+      "property":"requester_id.type",
+      "propertyType":"msg",
+      "rules":[  
+         {  
+            "t":"neq",
+            "v":"string",
+            "vt":"str"
+         },
+         {  
+            "t":"else"
+         }
+      ],
+      "checkall":"false",
+      "outputs":2,
+      "x":304.244384765625,
+      "y":1024.2899808883667,
+      "wires":[  
+         [  
+            "853ad14e.4ae38"
+         ],
+         [  
+            "d03eb2dd.eb07e"
+         ]
+      ]
+   },
+   {  
+      "id":"853ad14e.4ae38",
+      "type":"function",
+      "z":"c7bc4ae8.42c6d8",
+      "name":"[function]   error response",
+      "func":"msg.payload = \"the requester_id of the HTTP request should be a string\";\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":652.244384765625,
+      "y":1006.2899599075317,
+      "wires":[  
+         [  
+            "74b18e03.3ac34"
+         ]
+      ]
+   },
+   {  
+      "id":"74b18e03.3ac34",
+      "type":"http response",
+      "z":"c7bc4ae8.42c6d8",
+      "name":"[web service out]   CAF",
+      "statusCode":"",
+      "headers":{  
+
+      },
+      "x":725.2415771484375,
+      "y":876.1166486740112,
+      "wires":[  
+
+      ]
+   },
+   {  
+      "id":"61a6a91f.18db58",
+      "type":"switch",
+      "z":"c7bc4ae8.42c6d8",
+      "name":"[switch]   check that requester_id exists",
+      "property":"$exists(payload.requester_id)",
+      "propertyType":"jsonata",
+      "rules":[  
+         {  
+            "t":"false"
+         },
+         {  
+            "t":"else"
+         }
+      ],
+      "checkall":"false",
+      "outputs":2,
+      "x":325.01422119140625,
+      "y":630.914794921875,
+      "wires":[  
+         [  
+            "1d769b00.f2ea45"
+         ],
+         [  
+            "7f27b3d3.bb410c"
+         ]
+      ]
+   },
+   {  
+      "id":"2b8c0675.de899a",
+      "type":"function",
+      "z":"c7bc4ae8.42c6d8",
+      "name":"[function]   error response",
+      "func":"msg.payload = \"the exposed method that you selected is not included in the VDC Blueprint\";\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":799.0142211914062,
+      "y":1386.1875,
+      "wires":[  
+         [  
+            "7eba365e.913dd8"
+         ]
+      ]
+   },
+   {  
+      "id":"7eba365e.913dd8",
+      "type":"http response",
+      "z":"c7bc4ae8.42c6d8",
+      "name":"[web service out]   CAF",
+      "statusCode":"",
+      "headers":{  
+
+      },
+      "x":986.0142211914062,
+      "y":1491.1875,
+      "wires":[  
+
+      ]
+   },
+   {  
+      "id":"e433680d.55f218",
+      "type":"subflow:c7bc4ae8.42c6d8",
+      "z":"37359040.8968c",
+      "name":"",
+      "x":253.79258728027344,
+      "y":177.25000381469727,
+      "wires":[  
+         [  
+            "bd9321e4.2ce1b"
+         ],
+         [  
+            "5663e60f.6a2018"
+         ],
+         [  
+            "69d1b433.b7d63c"
+         ],
+         [  
+            "a0609f0c.4f7bb"
+         ]
+      ]
+   },
+   {  
+      "id":"be761ebc.27403",
+      "type":"http response",
+      "z":"37359040.8968c",
+      "name":"[web service out]   CAF",
+      "statusCode":"",
+      "headers":{  
+
+      },
+      "x":444.78124237060547,
+      "y":360.7158012390137,
+      "wires":[  
+
+      ]
+   },
+   {  
+      "id":"a27b57dd.4d52f8",
+      "type":"link in",
+      "z":"37359040.8968c",
+      "name":"[web service out]   CAF",
+      "links":[  
+         "350e6ce6.7355b4",
+         "93360e6a.144e3",
+         "62ca95ea.2e789c",
+         "68c5b13f.ef12"
+      ],
+      "x":205.78689575195312,
+      "y":358.6135892868042,
+      "wires":[  
+         [  
+            "be761ebc.27403"
+         ]
+      ]
+   },
+   {  
+      "id":"bd9321e4.2ce1b",
+      "type":"link out",
+      "z":"37359040.8968c",
+      "name":"",
+      "links":[  
+         "8988d744.651638"
+      ],
+      "x":485.78971672058105,
+      "y":47.73293876647949,
+      "wires":[  
+
+      ]
+   },
+   {  
+      "id":"69d1b433.b7d63c",
+      "type":"link out",
+      "z":"37359040.8968c",
+      "name":"",
+      "links":[  
+         "edea86bd.388a58"
+      ],
+      "x":485.7897491455078,
+      "y":166.732928276062,
+      "wires":[  
+
+      ]
+   },
+   {  
+      "id":"5663e60f.6a2018",
+      "type":"link out",
+      "z":"37359040.8968c",
+      "name":"",
+      "links":[  
+         "cff044cd.b0e2e8"
+      ],
+      "x":485.7925910949707,
+      "y":109.55397033691406,
+      "wires":[  
+
+      ]
+   },
+   {  
+      "id":"a0609f0c.4f7bb",
+      "type":"link out",
+      "z":"37359040.8968c",
+      "name":"",
+      "links":[  
+         "d5f74c4e.59b55"
+      ],
+      "x":483.78405952453613,
+      "y":242.556791305542,
+      "wires":[  
+
+      ]
+   }
+]
