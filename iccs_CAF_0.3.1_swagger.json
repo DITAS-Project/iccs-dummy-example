@@ -1,0 +1,331 @@
+{
+  "openapi" : "3.0.0",
+  "info" : {
+    "title" : "CAF API for DITAS Dummy Example",
+    "version" : "0.3.1"
+  },
+  "servers" : [ {
+    "description" : "CAF server",
+    "url" : "http://localhost:1880/CAF"
+  } ],
+  "paths" : {
+    "/patient-details" : {
+      "post" : {
+        "tags" : [ "patient biographical data" ],
+        "description" : "Given the SSN returns all the details of the patient",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "purpose" : {
+                    "type" : "string"
+                  },
+                  "requester_id" : {
+                    "type" : "string"
+                  },
+                  "attributes" : {
+                    "type" : "object",
+                    "properties" : {
+                      "SSN" : {
+                        "type" : "string"
+                      }
+                    },
+                    "required" : [ "SSN" ],
+                    "additionalProperties" : false
+                  }
+                },
+                "required" : [ "purpose", "requester_id", "attributes" ],
+                "additionalProperties" : false
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "patient details",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/patient"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/last-values" : {
+      "post" : {
+        "tags" : [ "blood tests" ],
+        "description" : "Given the SSN returns the last values for all the exams",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "purpose" : {
+                    "type" : "string"
+                  },
+                  "requester_id" : {
+                    "type" : "string"
+                  },
+                  "attributes" : {
+                    "type" : "object",
+                    "properties" : {
+                      "SSN" : {
+                        "type" : "string"
+                      }
+                    },
+                    "required" : [ "SSN" ],
+                    "additionalProperties" : false
+                  }
+                },
+                "required" : [ "purpose", "requester_id", "attributes" ],
+                "additionalProperties" : false
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "last values",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/exam"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/test-values" : {
+      "post" : {
+        "tags" : [ "blood tests" ],
+        "description" : "Given the SSN and a specific blood test returns the timeseries of the value of this test for the given patient",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "purpose" : {
+                    "type" : "string"
+                  },
+                  "requester_id" : {
+                    "type" : "string"
+                  },
+                  "attributes" : {
+                    "type" : "object",
+                    "properties" : {
+                      "SSN" : {
+                        "type" : "string"
+                      },
+                      "blood_test" : {
+                        "type" : "string"
+                      }
+                    },
+                    "required" : [ "SSN", "blood_test" ],
+                    "additionalProperties" : false
+                  }
+                },
+                "required" : [ "purpose", "requester_id", "attributes" ],
+                "additionalProperties" : false
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "test values",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/exam"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/test-average" : {
+      "post" : {
+        "tags" : [ "blood tests" ],
+        "description" : "Given a specific blood test and a range of age it returns the average of this value",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "purpose" : {
+                    "type" : "string"
+                  },
+                  "requester_id" : {
+                    "type" : "string"
+                  },
+                  "attributes" : {
+                    "type" : "object",
+                    "properties" : {
+                      "blood_test" : {
+                        "type" : "string"
+                      },
+                      "sub_blood_test" : {
+                        "type" : "string"
+                      },
+                      "upper_age" : {
+                        "type" : "integer"
+                      },
+                      "lower_age" : {
+                        "type" : "integer"
+                      }
+                    },
+                    "required" : [ "blood_test", "upper_age", "lower_age" ],
+                    "additionalProperties" : false
+                  }
+                },
+                "required" : [ "purpose", "requester_id", "attributes" ],
+                "additionalProperties" : false
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "average value of the specific blood test or sub blood test and its unit",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "blood_test" : {
+                      "type" : "string"
+                    },
+                    "sub_blood_test" : {
+                      "type" : "string"
+                    },
+                    "unit" : {
+                      "type" : "string"
+                    },
+                    "average" : {
+                      "type" : "number"
+                    }
+                  },
+                  "required" : [ "blood_test", "unit", "average" ],
+                  "additionalProperties" : false
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "patient" : {
+        "type" : "object",
+        "$ref" : "#/components/schemas/patient",
+        "properties" : {
+          "addressCity" : {
+            "type" : "string"
+          },
+          "addressRoad" : {
+            "type" : "string"
+          },
+          "addressRoadNumber" : {
+            "type" : "integer"
+          },
+          "birthCity" : {
+            "type" : "string"
+          },
+          "nationality" : {
+            "type" : "string"
+          },
+          "job" : {
+            "type" : "string"
+          },
+          "schoolYears" : {
+            "type" : "number"
+          },
+          "birthDate" : {
+            "type" : "string"
+          },
+          "gender" : {
+            "enum" : [ "M", "F" ]
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "patientId" : {
+            "type" : "string"
+          },
+          "socialId" : {
+            "type" : "string"
+          },
+          "surname" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "birthDate", "gender", "name", "patientId", "socialId", "surname" ],
+        "additionalProperties" : false
+      },
+      "exam" : {
+        "type" : "object",
+        "$ref" : "#/components/schemas/exam",
+        "properties" : {
+          "antithrombin" : {
+            "type" : "object"
+          },
+          "cholesterol" : {
+            "type" : "object",
+            "properties" : {
+              "hdl" : {
+                "type" : "object"
+              },
+              "ldl" : {
+                "type" : "object"
+              },
+              "total" : {
+                "type" : "object"
+              },
+              "tryglicerides" : {
+                "type" : "object"
+              }
+            }
+          },
+          "date" : {
+            "type" : "string"
+          },
+          "fibrinogen" : {
+            "type" : "object"
+          },
+          "haemoglobin" : {
+            "type" : "object"
+          },
+          "patientid" : {
+            "type" : "string"
+          },
+          "plateletCount" : {
+            "type" : "object"
+          },
+          "prothrombinTime" : {
+            "type" : "object"
+          },
+          "totalWhiteCellCount" : {
+            "type" : "object"
+          }
+        },
+        "required" : [ "date", "patientid" ]
+      }
+    }
+  }
+}
