@@ -1,0 +1,1024 @@
+[
+   {
+      "id":"709c6ac0.38fdf4",
+      "type":"tab",
+      "label":"CAF",
+      "disabled":false,
+      "info":""
+   },
+   {
+      "id":"572b622.4b0289c",
+      "type":"tab",
+      "label":"patient-details",
+      "disabled":false,
+      "info":""
+   },
+   {
+      "id":"ecb5e4ae.4c765",
+      "type":"tab",
+      "label":"last-values",
+      "disabled":false,
+      "info":""
+   },
+   {
+      "id":"12378465.f88554",
+      "type":"tab",
+      "label":"test-values",
+      "disabled":false,
+      "info":""
+   },
+   {
+      "id":"ea2821c7.c398c8",
+      "type":"tab",
+      "label":"test-average",
+      "disabled":false,
+      "info":""
+   },
+   {
+      "id":"59c8e00b.b8999",
+      "type":"subflow",
+      "name":"DITAS CAF",
+      "info":"",
+      "in":[
+
+      ],
+      "out":[
+         {
+            "x":854.9999923706055,
+            "y":1064.9998779296875,
+            "wires":[
+               {
+                  "id":"84afc337.9941c",
+                  "port":0
+               }
+            ]
+         },
+         {
+            "x":854.9999141693115,
+            "y":1159.9997673034668,
+            "wires":[
+               {
+                  "id":"84afc337.9941c",
+                  "port":1
+               }
+            ]
+         },
+         {
+            "x":859.0000133514404,
+            "y":1241.999994277954,
+            "wires":[
+               {
+                  "id":"84afc337.9941c",
+                  "port":2
+               }
+            ]
+         },
+         {
+            "x":854.9999694824219,
+            "y":1316.0000801086426,
+            "wires":[
+               {
+                  "id":"84afc337.9941c",
+                  "port":3
+               }
+            ]
+         }
+      ]
+   },
+   {
+      "id":"ba79f89b.21ec38",
+      "type":"MySQLdatabase",
+      "z":"",
+      "host":"",
+      "port":"3306",
+      "db":"ditas_dummy_example",
+      "tz":""
+   },
+   {
+      "id":"e39511f6.9df38",
+      "type":"CassandraDatabase",
+      "z":"",
+      "hosts":"",
+      "port":"9042",
+      "keyspace":"ditas"
+   },
+   {
+      "id":"36cd4b90.73e0f4",
+      "type":"http in",
+      "z":"59c8e00b.b8999",
+      "name":"HTTP request",
+      "url":"/CAF/:exposed_method",
+      "method":"post",
+      "upload":false,
+      "swaggerDoc":"",
+      "x":104.78118896484375,
+      "y":46.164727210998535,
+      "wires":[
+         [
+            "6bfe71be.7ab07"
+         ]
+      ]
+   },
+   {
+      "id":"84afc337.9941c",
+      "type":"switch",
+      "z":"59c8e00b.b8999",
+      "name":"EXPOSED_API.Methods",
+      "property":"req.params.exposed_method",
+      "propertyType":"msg",
+      "rules":[
+         {
+            "t":"eq",
+            "v":"patient-details",
+            "vt":"str"
+         },
+         {
+            "t":"eq",
+            "v":"last-values",
+            "vt":"str"
+         },
+         {
+            "t":"eq",
+            "v":"test-values",
+            "vt":"str"
+         },
+         {
+            "t":"eq",
+            "v":"test-average",
+            "vt":"str"
+         },
+         {
+            "t":"else"
+         }
+      ],
+      "checkall":"false",
+      "outputs":5,
+      "x":332.7897033691406,
+      "y":1258.6193180084229,
+      "wires":[
+         [
+
+         ],
+         [
+
+         ],
+         [
+
+         ],
+         [
+
+         ],
+         [
+            "7381b577.c54f8c"
+         ]
+      ]
+   },
+   {
+      "id":"6bfe71be.7ab07",
+      "type":"switch",
+      "z":"59c8e00b.b8999",
+      "name":"check that purpose exists",
+      "property":"$exists(payload.purpose)",
+      "propertyType":"jsonata",
+      "rules":[
+         {
+            "t":"false"
+         },
+         {
+            "t":"else"
+         }
+      ],
+      "checkall":"false",
+      "outputs":2,
+      "x":262.01422119140625,
+      "y":208.0056915283203,
+      "wires":[
+         [
+            "e0734c49.31378"
+         ],
+         [
+            "3be0a4c0.92017c"
+         ]
+      ]
+   },
+   {
+      "id":"e0734c49.31378",
+      "type":"function",
+      "z":"59c8e00b.b8999",
+      "name":"error response",
+      "func":"msg.payload = \"the body of every HTTP request should contain the purpose of the request\";\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":642.2442855834961,
+      "y":281.9261236190796,
+      "wires":[
+         [
+            "bd664572.2f8868"
+         ]
+      ]
+   },
+   {
+      "id":"bd664572.2f8868",
+      "type":"http response",
+      "z":"59c8e00b.b8999",
+      "name":"HTTP response",
+      "statusCode":"",
+      "headers":{
+
+      },
+      "x":713.241569519043,
+      "y":169.75292491912842,
+      "wires":[
+
+      ]
+   },
+   {
+      "id":"3be0a4c0.92017c",
+      "type":"function",
+      "z":"59c8e00b.b8999",
+      "name":"strore purpose details to msg",
+      "func":"msg.purpose = {};\n\nmsg.purpose.value = msg.payload.purpose;\n\nmsg.purpose.type = typeof(msg.payload.purpose);\n\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":311.24436950683594,
+      "y":306.9262409210205,
+      "wires":[
+         [
+            "e43570b6.dd133"
+         ]
+      ]
+   },
+   {
+      "id":"e43570b6.dd133",
+      "type":"switch",
+      "z":"59c8e00b.b8999",
+      "name":"check that purpose is string",
+      "property":"purpose.type",
+      "propertyType":"msg",
+      "rules":[
+         {
+            "t":"neq",
+            "v":"string",
+            "vt":"str"
+         },
+         {
+            "t":"else"
+         }
+      ],
+      "checkall":"false",
+      "outputs":2,
+      "x":300.24436950683594,
+      "y":429.65356159210205,
+      "wires":[
+         [
+            "8fb2a5ae.f50a28"
+         ],
+         [
+            "3e570c9e.924124"
+         ]
+      ]
+   },
+   {
+      "id":"8fb2a5ae.f50a28",
+      "type":"function",
+      "z":"59c8e00b.b8999",
+      "name":"error response",
+      "func":"msg.payload = \"the purpose of the HTTP request should be a string\";\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":626.2443771362305,
+      "y":428.4716901779175,
+      "wires":[
+         [
+            "552fa99.fe34c58"
+         ]
+      ]
+   },
+   {
+      "id":"552fa99.fe34c58",
+      "type":"http response",
+      "z":"59c8e00b.b8999",
+      "name":"HTTP response",
+      "statusCode":"",
+      "headers":{
+
+      },
+      "x":745.2415542602539,
+      "y":335.2984094619751,
+      "wires":[
+
+      ]
+   },
+   {
+      "id":"419a8e53.b27a",
+      "type":"function",
+      "z":"59c8e00b.b8999",
+      "name":"error response",
+      "func":"msg.payload = \"the body of every HTTP request should contain the requester_id of the requester\";\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":647.2443695068359,
+      "y":647.4715633392334,
+      "wires":[
+         [
+            "db82e7ba.f968a8"
+         ]
+      ]
+   },
+   {
+      "id":"db82e7ba.f968a8",
+      "type":"http response",
+      "z":"59c8e00b.b8999",
+      "name":"HTTP response",
+      "statusCode":"",
+      "headers":{
+
+      },
+      "x":870.2415313720703,
+      "y":704.298433303833,
+      "wires":[
+
+      ]
+   },
+   {
+      "id":"e6703a7.7b70fc8",
+      "type":"function",
+      "z":"59c8e00b.b8999",
+      "name":"strore requester_id details to msg",
+      "func":"msg.requester_id = {};\n\nmsg.requester_id.value = msg.payload.requester_id;\n\nmsg.requester_id.type = typeof(msg.payload.requester_id);\n\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":229.24436950683594,
+      "y":898.471718788147,
+      "wires":[
+         [
+            "a213e0d6.4119d"
+         ]
+      ]
+   },
+   {
+      "id":"a213e0d6.4119d",
+      "type":"switch",
+      "z":"59c8e00b.b8999",
+      "name":"check that requester_id is string",
+      "property":"requester_id.type",
+      "propertyType":"msg",
+      "rules":[
+         {
+            "t":"neq",
+            "v":"string",
+            "vt":"str"
+         },
+         {
+            "t":"else"
+         }
+      ],
+      "checkall":"false",
+      "outputs":2,
+      "x":274.244384765625,
+      "y":1024.2899808883667,
+      "wires":[
+         [
+            "fb68c7dc.2b0d58"
+         ],
+         [
+            "84afc337.9941c"
+         ]
+      ]
+   },
+   {
+      "id":"fb68c7dc.2b0d58",
+      "type":"function",
+      "z":"59c8e00b.b8999",
+      "name":"error response",
+      "func":"msg.payload = \"the requester_id of the HTTP request should be a string\";\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":622.244384765625,
+      "y":1006.2899599075317,
+      "wires":[
+         [
+            "87533c1b.95499"
+         ]
+      ]
+   },
+   {
+      "id":"87533c1b.95499",
+      "type":"http response",
+      "z":"59c8e00b.b8999",
+      "name":"HTTP response",
+      "statusCode":"",
+      "headers":{
+
+      },
+      "x":705.2415771484375,
+      "y":876.1166486740112,
+      "wires":[
+
+      ]
+   },
+   {
+      "id":"3e570c9e.924124",
+      "type":"switch",
+      "z":"59c8e00b.b8999",
+      "name":"check that requester_id exists",
+      "property":"$exists(payload.requester_id)",
+      "propertyType":"jsonata",
+      "rules":[
+         {
+            "t":"false"
+         },
+         {
+            "t":"else"
+         }
+      ],
+      "checkall":"false",
+      "outputs":2,
+      "x":305.01422119140625,
+      "y":630.914794921875,
+      "wires":[
+         [
+            "419a8e53.b27a"
+         ],
+         [
+            "e6703a7.7b70fc8"
+         ]
+      ]
+   },
+   {
+      "id":"7381b577.c54f8c",
+      "type":"function",
+      "z":"59c8e00b.b8999",
+      "name":"error response",
+      "func":"msg.payload = \"the exposed method that you selected is not included in the VDC Blueprint\";\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":769.0142211914062,
+      "y":1386.1875,
+      "wires":[
+         [
+            "cfcce49b.945e38"
+         ]
+      ]
+   },
+   {
+      "id":"cfcce49b.945e38",
+      "type":"http response",
+      "z":"59c8e00b.b8999",
+      "name":"HTTP response",
+      "statusCode":"",
+      "headers":{
+
+      },
+      "x":966.0142211914062,
+      "y":1491.1875,
+      "wires":[
+
+      ]
+   },
+   {
+      "id":"c9dde12a.ff4b7",
+      "type":"link in",
+      "z":"572b622.4b0289c",
+      "name":"patient-details",
+      "links":[
+         "ce536723.34952",
+         "9e8d0035.3b9068"
+      ],
+      "x":215,
+      "y":140,
+      "wires":[
+         [
+            "a8d64921.627cc"
+         ]
+      ]
+   },
+   {
+      "id":"7283f54.8a4098c",
+      "type":"link out",
+      "z":"572b622.4b0289c",
+      "name":"patient-details",
+      "links":[
+         "731361c1.56e26",
+         "f752c8ce.aa8538"
+      ],
+      "x":1095,
+      "y":140,
+      "wires":[
+
+      ]
+   },
+   {
+      "id":"237105cc.9302fa",
+      "type":"link in",
+      "z":"ecb5e4ae.4c765",
+      "name":"last-values",
+      "links":[
+         "5f5680e3.d260d8",
+         "b90316f7.0d3d48"
+      ],
+      "x":182,
+      "y":252,
+      "wires":[
+         [
+            "91dc8cef.b26ed"
+         ]
+      ]
+   },
+   {
+      "id":"2c92da73.47c7de",
+      "type":"link out",
+      "z":"ecb5e4ae.4c765",
+      "name":"last-values",
+      "links":[
+         "731361c1.56e26",
+         "f752c8ce.aa8538"
+      ],
+      "x":1153,
+      "y":201,
+      "wires":[
+
+      ]
+   },
+   {
+      "id":"45c896c.9522ae8",
+      "type":"link in",
+      "z":"12378465.f88554",
+      "name":"test-values",
+      "links":[
+         "bb34e22b.f5e5d8",
+         "6dc2cc3c.afd964"
+      ],
+      "x":166,
+      "y":349,
+      "wires":[
+         [
+            "1027d23f.6fa7ae"
+         ]
+      ]
+   },
+   {
+      "id":"cf6f054f.650aa8",
+      "type":"link out",
+      "z":"12378465.f88554",
+      "name":"test-values",
+      "links":[
+         "731361c1.56e26",
+         "f752c8ce.aa8538"
+      ],
+      "x":1125,
+      "y":322,
+      "wires":[
+
+      ]
+   },
+   {
+      "id":"5ace19b9.fbb998",
+      "type":"link in",
+      "z":"ea2821c7.c398c8",
+      "name":"test-average",
+      "links":[
+         "90a83bca.a3ffb8",
+         "a20d9342.32d7d"
+      ],
+      "x":149,
+      "y":215,
+      "wires":[
+         [
+            "6e696649.50472"
+         ]
+      ]
+   },
+   {
+      "id":"7d985611.cabbf",
+      "type":"link out",
+      "z":"ea2821c7.c398c8",
+      "name":"test-average",
+      "links":[
+         "731361c1.56e26",
+         "f752c8ce.aa8538"
+      ],
+      "x":1067,
+      "y":177,
+      "wires":[
+
+      ]
+   },
+   {
+      "id":"84246365.7e2f08",
+      "type":"subflow:59c8e00b.b8999",
+      "z":"709c6ac0.38fdf4",
+      "name":"",
+      "x":390,
+      "y":260,
+      "wires":[
+         [
+            "9e8d0035.3b9068"
+         ],
+         [
+            "b90316f7.0d3d48"
+         ],
+         [
+            "6dc2cc3c.afd964"
+         ],
+         [
+            "a20d9342.32d7d"
+         ]
+      ]
+   },
+   {
+      "id":"a8d64921.627cc",
+      "type":"function",
+      "z":"572b622.4b0289c",
+      "name":"construct MySQL query",
+      "func":"var SSN = msg.payload.attributes.SSN;\n\nmsg.topic = \"select * from patient where socialId  = \"+\"\\\"\"+SSN+\"\\\"\";\n\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":226.2273178100586,
+      "y":461.52301597595215,
+      "wires":[
+         [
+            "c616bad8.221f3"
+         ]
+      ]
+   },
+   {
+      "id":"b7f6c43.3d67d38",
+      "type":"function",
+      "z":"572b622.4b0289c",
+      "name":"construct exposed data tuple",
+      "func":"msg.payload = msg.payload[0];\n\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":920,
+      "y":460,
+      "wires":[
+         [
+            "7283f54.8a4098c"
+         ]
+      ]
+   },
+   {
+      "id":"9e8d0035.3b9068",
+      "type":"link out",
+      "z":"709c6ac0.38fdf4",
+      "name":"patient-details",
+      "links":[
+         "c9dde12a.ff4b7"
+      ],
+      "x":695,
+      "y":80,
+      "wires":[
+
+      ]
+   },
+   {
+      "id":"6dc2cc3c.afd964",
+      "type":"link out",
+      "z":"709c6ac0.38fdf4",
+      "name":"test-values",
+      "links":[
+         "45c896c.9522ae8"
+      ],
+      "x":695,
+      "y":340,
+      "wires":[
+
+      ]
+   },
+   {
+      "id":"b90316f7.0d3d48",
+      "type":"link out",
+      "z":"709c6ac0.38fdf4",
+      "name":"last-values",
+      "links":[
+         "237105cc.9302fa"
+      ],
+      "x":695,
+      "y":220,
+      "wires":[
+
+      ]
+   },
+   {
+      "id":"a20d9342.32d7d",
+      "type":"link out",
+      "z":"709c6ac0.38fdf4",
+      "name":"test-average",
+      "links":[
+         "5ace19b9.fbb998"
+      ],
+      "x":695,
+      "y":460,
+      "wires":[
+
+      ]
+   },
+   {
+      "id":"84be9a27.ea104",
+      "type":"http response",
+      "z":"709c6ac0.38fdf4",
+      "name":"HTTP response",
+      "statusCode":"",
+      "headers":{
+
+      },
+      "x":600,
+      "y":620,
+      "wires":[
+
+      ]
+   },
+   {
+      "id":"f752c8ce.aa8538",
+      "type":"link in",
+      "z":"709c6ac0.38fdf4",
+      "name":"HTTP response",
+      "links":[
+         "7283f54.8a4098c",
+         "2c92da73.47c7de",
+         "cf6f054f.650aa8",
+         "7d985611.cabbf"
+      ],
+      "x":381.00565338134766,
+      "y":617.8977880477905,
+      "wires":[
+         [
+            "84be9a27.ea104"
+         ]
+      ]
+   },
+   {
+      "id":"c616bad8.221f3",
+      "type":"mysql",
+      "z":"572b622.4b0289c",
+      "mydb":"ba79f89b.21ec38",
+      "name":"query patient biographical data MySQL database",
+      "x":590,
+      "y":280,
+      "wires":[
+         [
+            "b7f6c43.3d67d38"
+         ]
+      ]
+   },
+   {
+      "id":"91dc8cef.b26ed",
+      "type":"function",
+      "z":"ecb5e4ae.4c765",
+      "name":"construct MySQL query",
+      "func":"var SSN = msg.payload.attributes.SSN;\n\nmsg.topic = \"select patientId from patient where socialId  = \"+\"\\\"\"+SSN+\"\\\"\";\n\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":301.22731018066406,
+      "y":583.3890933990479,
+      "wires":[
+         [
+            "f2cb013b.ec8c18"
+         ]
+      ]
+   },
+   {
+      "id":"e8e18bf7.ee3b08",
+      "type":"function",
+      "z":"ecb5e4ae.4c765",
+      "name":"construct Cassandra query",
+      "func":"var id = msg.payload[0].patientId;\n\nmsg.payload = \"\";\n\nmsg.topic = \"SELECT * FROM blood_tests WHERE patientid = \"+id+\" order by date desc limit 1\";\n\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":709.2273101806641,
+      "y":572.3891477584839,
+      "wires":[
+         [
+            "c17029fa.1db17"
+         ]
+      ]
+   },
+   {
+      "id":"c17029fa.1db17",
+      "type":"cassandra",
+      "z":"ecb5e4ae.4c765",
+      "mydb":"e39511f6.9df38",
+      "name":"query blood tests Cassandra database",
+      "x":921.2272338867188,
+      "y":444.29827880859375,
+      "wires":[
+         [
+            "e4a66480.8a0b3"
+         ]
+      ]
+   },
+   {
+      "id":"e4a66480.8a0b3",
+      "type":"function",
+      "z":"ecb5e4ae.4c765",
+      "name":"construct exposed data tuple",
+      "func":"msg.payload = msg.payload[0];\n\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":1097.227294921875,
+      "y":573.3892211914062,
+      "wires":[
+         [
+            "2c92da73.47c7de"
+         ]
+      ]
+   },
+   {
+      "id":"f2cb013b.ec8c18",
+      "type":"mysql",
+      "z":"ecb5e4ae.4c765",
+      "mydb":"ba79f89b.21ec38",
+      "name":"query patient biographical data MySQL database",
+      "x":450,
+      "y":441,
+      "wires":[
+         [
+            "e8e18bf7.ee3b08"
+         ]
+      ]
+   },
+   {
+      "id":"6e696649.50472",
+      "type":"function",
+      "z":"ea2821c7.c398c8",
+      "name":"construct MySQL query",
+      "func":"var now = new Date();\n\nvar low = new Date(now);\n\nvar high = new Date(now);\n\nlow.setFullYear(now.getFullYear() - msg.payload.attributes.upper_age);\n\nhigh.setFullYear(now.getFullYear() - msg.payload.attributes.lower_age);\n\nflow.set(\"test\",msg.payload.attributes.blood_test);\n\nflow.set(\"subtest\",msg.payload.attributes.sub_blood_test);\n\nmsg.topic = \"select patientId from patient where birthDate < \"+\"\\\"\"+high.toISOString()+\"\\\"\"+\" and birthDate > \"+\"\\\"\"+low.toISOString()+\"\\\"\";\n\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":162.22735595703125,
+      "y":605.1589965820312,
+      "wires":[
+         [
+            "1248e3d4.bae0ac"
+         ]
+      ]
+   },
+   {
+      "id":"915aebb6.ec3498",
+      "type":"function",
+      "z":"ea2821c7.c398c8",
+      "name":"construct Cassandra query",
+      "func":"var test = flow.get(\"test\");\n\nvar subtest = flow.get(\"subtest\");\n\nvar avg = \"\";\n\nvar unit = \"\";\n\nif (subtest == null) {\n    \n    avg = test+\".value\";\n    unit = test+\".unit\";\n}\nelse {\n    \n    avg = test+\".\"+subtest+\".value\";\n    unit = test+\".\"+subtest+\".unit\";\n}\n\nvar ids = [];\n\nfor (i=0; i<msg.payload.length; i++) {\n    \n    ids.push(msg.payload[i].patientId);\n    \n}\n\nmsg.payload = \"\";\n\nvar condition = \"IN (\"+ids[0];\n\nfor (k=1; k<ids.length; k++) {\n    \n    condition = condition+\", \"+ids[k];\n    \n}\n\ncondition = condition+\")\";\n\nmsg.topic = \"SELECT AVG(\"+avg+\") AS average, \"+unit+\" as unit FROM blood_tests WHERE patientid \"+condition+\" GROUP BY patientid\";\n\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":479.227294921875,
+      "y":612.0684204101562,
+      "wires":[
+         [
+            "84d314ba.6f3fc"
+         ]
+      ]
+   },
+   {
+      "id":"1248e3d4.bae0ac",
+      "type":"mysql",
+      "z":"ea2821c7.c398c8",
+      "mydb":"ba79f89b.21ec38",
+      "name":"query patient biographical data MySQL database",
+      "x":383,
+      "y":375,
+      "wires":[
+         [
+            "915aebb6.ec3498"
+         ]
+      ]
+   },
+   {
+      "id":"84d314ba.6f3fc",
+      "type":"cassandra",
+      "z":"ea2821c7.c398c8",
+      "mydb":"e39511f6.9df38",
+      "name":"query blood tests Cassandra database",
+      "x":811,
+      "y":377,
+      "wires":[
+         [
+            "22270cf7.5163b4"
+         ]
+      ]
+   },
+   {
+      "id":"22270cf7.5163b4",
+      "type":"function",
+      "z":"ea2821c7.c398c8",
+      "name":"construct exposed data tuple",
+      "func":"var test = flow.get(\"test\");\n\nvar subtest = flow.get(\"subtest\");\n\nvar value = msg.payload[0].average;\n\nvar unit = msg.payload[0].unit;\n\nvar float = false;\n\nif (value % 1 !== 0) {\n    \n    float = true;\n    \n}\n\nif (float) {\n\nvar sum = 0.0;\n\nfor (i=0; i<msg.payload.length; i++) {\n\n    sum = sum + parseFloat(msg.payload[i].average);\n    \n}\n\n    var avg = parseFloat(sum/msg.payload.length);\n    \n}\n\nelse {\n    \nvar sum = 0;\n\nfor (i=0; i<msg.payload.length; i++) {\n\n    sum = sum + parseInt(msg.payload[i].average);\n    \n}\n\n    var avg = parseInt(sum/msg.payload.length);\n    \n}\n\nmsg.payload = {};\n\nmsg.payload.blood_test = test;\n\n\nif (subtest != null) {\n\nmsg.payload.sub_blood_test = subtest;\n\n}\n\nmsg.payload.average = avg;\n\nmsg.payload.unit = unit;\n\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":867,
+      "y":609,
+      "wires":[
+         [
+            "7d985611.cabbf"
+         ]
+      ]
+   },
+   {
+      "id":"3aab85fe.0c8382",
+      "type":"inject",
+      "z":"ea2821c7.c398c8",
+      "name":"",
+      "topic":"select * from patient",
+      "payload":"",
+      "payloadType":"date",
+      "repeat":"",
+      "crontab":"",
+      "once":false,
+      "x":158,
+      "y":898,
+      "wires":[
+         [
+            "827742e4.407f48"
+         ]
+      ]
+   },
+   {
+      "id":"827742e4.407f48",
+      "type":"mysql",
+      "z":"ea2821c7.c398c8",
+      "mydb":"ba79f89b.21ec38",
+      "name":"query patient biographical data MySQL database",
+      "x":514,
+      "y":906,
+      "wires":[
+         [
+            "51a68a0b.323104"
+         ]
+      ]
+   },
+   {
+      "id":"51a68a0b.323104",
+      "type":"debug",
+      "z":"ea2821c7.c398c8",
+      "name":"",
+      "active":true,
+      "console":"false",
+      "complete":"false",
+      "x":839,
+      "y":910,
+      "wires":[
+
+      ]
+   },
+   {
+      "id":"1027d23f.6fa7ae",
+      "type":"function",
+      "z":"12378465.f88554",
+      "name":"construct MySQL query",
+      "func":"var SSN = msg.payload.attributes.SSN;\n\nflow.set(\"test\",msg.payload.attributes.blood_test);\n\nmsg.topic = \"select patientId from patient where socialId  = \"+\"\\\"\"+SSN+\"\\\"\";\n\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":242.2273178100586,
+      "y":733.3891134262085,
+      "wires":[
+         [
+            "6529428e.a86a24"
+         ]
+      ]
+   },
+   {
+      "id":"2163d5fd.876a9a",
+      "type":"function",
+      "z":"12378465.f88554",
+      "name":"construct Cassandra query",
+      "func":"var id = msg.payload[0].patientId;\n\nvar test = flow.get(\"test\");\n\nmsg.payload = \"\";\n\nmsg.topic = \"SELECT patientid, date, \"+test+\" FROM blood_tests WHERE patientid = \"+id+\" ORDER BY date DESC\";\n\nreturn msg;",
+      "outputs":1,
+      "noerr":0,
+      "x":657.2273483276367,
+      "y":749.2981147766113,
+      "wires":[
+         [
+            "80c8d81c.754f9"
+         ]
+      ]
+   },
+   {
+      "id":"6529428e.a86a24",
+      "type":"mysql",
+      "z":"12378465.f88554",
+      "mydb":"ba79f89b.21ec38",
+      "name":"query patient biographical data MySQL database",
+      "x":517,
+      "y":509,
+      "wires":[
+         [
+            "2163d5fd.876a9a"
+         ]
+      ]
+   },
+   {
+      "id":"80c8d81c.754f9",
+      "type":"cassandra",
+      "z":"12378465.f88554",
+      "mydb":"e39511f6.9df38",
+      "name":"query blood tests Cassandra database",
+      "x":974,
+      "y":515,
+      "wires":[
+         [
+            "cf6f054f.650aa8"
+         ]
+      ]
+   }
+]
