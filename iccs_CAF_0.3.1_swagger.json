@@ -365,7 +365,7 @@
                   "type":"object"
                },
                "patientid":{
-                  "type":"string"
+                  "type":"number"
                },
                "plateletCount":{
                   "type":"object"
